@@ -3,39 +3,32 @@
 #include <ctype.h> // Para isalpha
 #include <windows.h>// para todo system
 #include <locale.h> //para usar caracteres especiales
+#include <string.h> //para usar strings
 
 //== VARIABLES CONSTANTES
 #define PHC 14.50
 #define PHN 14.80
 
 //== VARIABLES GLOBALES
-char line[]="\n====================================\n";
-
-//=== Registros ===
-struct dates {
-	char name[100];
-	char lastname[100];
-	char ci[10];
-	char address[200];
-	char cell[10];
-	char email[100];
-}dt;
+char line[]="\n============================================\n",
+	name[30]="", lastname[30]="", dni[10]="", 
+	direction[30]="", cell[10]="", email[30]="";
 
 //== Funciones ==
 int teacherInfo();
-int contractData();
-int nominationBuy();
+int contract(float d,float aditional);
 int validation();
-int viewInfo(float salary);
+int viewInfo(float salary, float subTotal);
 
-
+//Funcion principal
 int main () {
-	setlocale(LC_ALL, "spanish");
-	int men=0;
+	setlocale(LC_ALL, "spanish");//Para usar alfabeto en español
+	int men=0; 
+	float d=0, aditional=0;
 	system("color 0a");
 	
 	menu:
-		printf("%s**Sistema de pago**\n\n1.- Datos del Docente\n2.- Datos por Contrato\n3.- Pago del Nombramiento\n4.- Salir\n\tOpcion:  ",line);
+		printf("%s**Sistema de pago**\n\n1.- Datos del Docente\n2.- Datos por Contrato\n3.- Datos por Nomina\n4 .- Salir\n\tOpcion:  ",line);
 		scanf("%d", &men);
 		fflush(stdin);
 		system("cls");
@@ -47,16 +40,21 @@ int main () {
 			system("cls");
 			goto menu;
 		case 2:
-			contractData();
+			d=11.45; 
+			aditional=0.13;
+			contract(d, aditional);
 			system("pause");
 			system("cls");
 			goto menu;
 		case 3:
-			nominationBuy();
+			d=10.15;
+			aditional=0.15;
+			contract(d, aditional);
 			system("pause");
 			system("cls");
 			goto menu;
 		case 4:
+			printf("Pulse un Botón para cerrar el programa...");
 			break;
 		default: goto menu;
 			
@@ -66,6 +64,7 @@ int main () {
 	return 0;
 };
 
+//validación si lo ingresado son letras 
 int validation(char letters[]){
 	int i=0;
 	while ( letters[i]) {
@@ -78,61 +77,105 @@ int validation(char letters[]){
 	
 };
 
+//funcion para ingresar datos del docente
 int teacherInfo() {
+	char warning[] = "==Ingresar Datos y no dejar en blanco==\n",
+	 warning2[]="==Son 10 digitos a ingresar==\n",
+	 warning3[] = "==Solo se aceptan letras==\n";
+
 	printf("%sIngrese los Datos del docente\n\n", line);
 	do{
 		printf("Ingrese el número de cédula del Docente\n"); 
-		gets(dt.ci);
-	} while( strlen(dt.ci) != 10 );
+		gets(dni);
+		if(strlen(dni) != 10){
+			printf(warning2);
+		};
+		fflush(stdin);
+	} while( strlen(dni) != 10 );//valida que tenga 10 digitos
 	do {
 		printf("Ingrese Los Nombres del Docente: \n");
-		gets(dt.name);
-	} while(!validation(dt.name));
+		gets(name);
+		fflush(stdin);
+		if(!validation(name)){
+			printf(warning3);
+		};
+		if (strlen(name) == 0){
+			printf(warning);
+		};
+	} while(!validation(name) || strlen(name) == 0);//valida que solo se ingresen letras
+	
+	
 	do {
 		printf("Ingresa los Apellidos del Docente: \n");
-		gets(dt.lastname);
-	} while(!validation(dt.lastname));
-	printf("Ingrese la dirección del docente\n");
-	gets(dt.address);
-	printf("Ingrese el correo del docente\n");
-	gets(dt.email);
+		gets(lastname);
+		fflush(stdin);
+		if(!validation(lastname)){
+			printf(warning3);
+		};
+		if (strlen(lastname) == 0){
+			printf(warning);
+		};
+	} while(!validation(lastname) || strlen(lastname) == 0);//valida que solo se ingresen letras
+	do{
+		printf("Ingrese la dirección del docente\n");
+		gets(direction);
+		if(strlen(direction) == 0){
+			printf(warning);
+		};
+	} while ( strlen(direction) == 0);
+	
+	do{
+		printf("Ingrese el correo del docente\n");
+		gets(email);
+		if(strlen(email) == 0){
+			printf(warning);
+		};
+		fflush(stdin);
+	} while ( strlen(email) == 0);	
+	
 	do {
 		printf("Ingresa el número telefonico del Docente: \n");
-		gets(dt.cell);
-	} while(strlen(dt.cell) != 10);
-	
+		gets(cell);
+		if(strlen(cell) != 10){
+			printf(warning2);
+		};
+		fflush(stdin);
+	} while(strlen(cell) != 10);//valida que solo se ingresen 10 digitos
+
 };
 
-int contractData(){
+//funcion de calculo del docente por contrato
+int contract(float d, float aditional){
 	int h=0;
-	float fee=0, d=11.45,subTotal=0 , aditional=0.13, total=0;
+	float fee=0,subTotal=0, total=0;
 	do {
-		printf("Ingrese las horas trabajadas en el mes:\n");
+		printf("%s Ingrese las horas trabajadas en el mes:\n",line);
 		scanf("%d", &h);
 		fflush(stdin);
 	}while(h < 0);
 	fee = h * PHC;
-	subTotal= (fee * 11.45) / 100;
+	subTotal= fee - ((fee * d) / 100 );
 	if ( h > 160 ){
 		total = (subTotal * aditional) + subTotal;
 	} else {
 		total = subTotal;
 	};
-	
-	viewInfo(total);
+	system("cls");
+	viewInfo(total, subTotal);// llama los datos del docente y se le envie el valor del salario
 };
 
-int viewInfo (float salary) {
+//funcion para visualizar los datos del docente
+int viewInfo (float salary, float subTotal) {
 	printf(line);
-	printf("Nombres del Docente: %s\n", dt.name);
-	printf("Apellidos del Docente: %s \n" , dt.lastname);
-	printf("Número de cédula del Docente: %s \n", dt.ci);
-	printf("Correo Electronico: %s \n", dt.email);  
-	printf("Número de telefono: %s \n", dt.cell);
-	printf("Dirección Domiciliaria %s\n", dt.address);
-	printf("Sueldo: %.2f", salary);
+	printf("\t Datos del Docente\n\n");
+	printf("Nombres y Apellidos del Docente: %s %s\n", name, lastname);
+	printf("Número de cédula del Docente: %s \n", dni);
+	printf("Correo Electronico: %s \n", email);  
+	printf("Número de telefono: %s \n", cell);
+	printf("Dirección Domiciliaria: %s\n", direction);
 	printf(line);
-}
-
-int nominationBuy(){
+	printf("SubTotal: %.2f\n", subTotal);
+	printf("Sueldo:   %.2f", salary);
+	printf(line);
 };
+
