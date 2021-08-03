@@ -1,6 +1,6 @@
 # projectInC
 Proyectos de programación en c, de la universidad
-Sistema de control para colegios
+Sistema de control de docentes
 
 ## Pre-requisitos
 Tener instalado 
